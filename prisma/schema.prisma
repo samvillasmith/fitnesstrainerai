@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String         @id @default(uuid())
+  name       String?
+  email      String         @unique
+  height     Float?
+  weight     Float?
+  goalWeight Float?
+  age        Int?
+  gender     Gender?
+  createdAt  DateTime       @default(now())
+  progress   UserProgress[]
+}
+
+model Workout {
+  id            Int               @id @default(autoincrement())
+  name          String
+  description   String?
+  week          Int
+  dayOfWeek     DayOfWeek
+  exercises     WorkoutExercise[]
+}
+
+model Exercise {
+  id          Int               @id @default(autoincrement())
+  name        String
+  description String?
+  workouts    WorkoutExercise[]
+}
+
+model WorkoutExercise {
+  id         Int      @id @default(autoincrement())
+  workout    Workout  @relation(fields: [workoutId], references: [id])
+  workoutId  Int
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  exerciseId Int
+  sets       Int?
+  reps       Int?
+  duration   Int?
+}
+
+model UserProgress {
+  id                Int      @id @default(autoincrement())
+  user              User     @relation(fields: [userId], references: [id])
+  userId            String
+  date              DateTime @default(now())
+  weight            Float?
+  caloriesConsumed  Int?
+  workoutCompleted  Boolean?
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+enum DayOfWeek {
+  monday
+  tuesday
+  wednesday
+  thursday
+  friday
+  saturday
+  sunday
+}
